@@ -30,32 +30,109 @@ logger = logging.getLogger(__name__)
 # If the model uses numeric indices only, the FALLBACK_LABELS dict is used.
 # ---------------------------------------------------------------------------
 LABEL_VI: Dict[str, str] = {
-    "Cavity":         "Sâu răng",
-    "Fillings":       "Trám răng",
-    "Impacted Tooth": "Răng mọc ngầm",
-    "Implant":        "Cấy ghép implant",
+    "Caries":               "Sâu răng",
+    "Crown":                "Mão răng sứ",
+    "Filling":              "Trám răng",
+    "Implant":              "Cấy ghép implant",
+    "Malaligned":           "Răng lệch lạc",
+    "Mandibular Canal":     "Ống thần kinh hàm dưới",
+    "Missing teeth":        "Mất răng",
+    "Periapical lesion":    "Tổn thương quanh chóp",
+    "Retained root":        "Chân răng còn sót",
+    "Root Canal Treatment": "Điều trị tủy",
+    "Root Piece":           "Mảnh chân răng",
+    "Impacted tooth":       "Răng mọc ngầm",
+    "Maxillary sinus":      "Xoang hàm trên",
+    "Bone Loss":            "Tiêu xương",
+    "Fracture teeth":       "Răng gãy vỡ",
+    "Permanent Teeth":      "Răng vĩnh viễn",
+    "Supra Eruption":       "Răng trồi",
+    "TAD":                  "Neo chỉnh nha (TAD)",
+    "Abutment":             "Trụ implant",
+    "Attrition":            "Mòn răng",
+    "Bone defect":          "Khuyết hổng xương",
+    "Gingival former":      "Đầu lành thương nướu",
+    "Metal band":           "Band kim loại",
+    "Orthodontic brackets": "Mắc cài chỉnh nha",
+    "Permanent retainer":   "Hàm duy trì cố định",
+    "Post-core":            "Chốt lõi răng",
+    "Plating":              "Nẹp vít xương",
+    "Wire":                 "Dây cung chỉnh nha",
+    "Cyst":                 "Nang xương hàm",
+    "Root resorption":      "Tiêu chân răng",
+    "Primary teeth":        "Răng sữa",
 }
 
 # Fallback by index if the model's class names don't match the keys above
 FALLBACK_LABELS: Dict[int, str] = {
-    0: "Sâu răng",
-    1: "Trám răng",
-    2: "Răng mọc ngầm",
-    3: "Cấy ghép implant",
+    0:  "Sâu răng",
+    1:  "Mão răng sứ",
+    2:  "Trám răng",
+    3:  "Cấy ghép implant",
+    4:  "Răng lệch lạc",
+    5:  "Ống thần kinh hàm dưới",
+    6:  "Mất răng",
+    7:  "Tổn thương quanh chóp",
+    8:  "Chân răng còn sót",
+    9:  "Điều trị tủy",
+    10: "Mảnh chân răng",
+    11: "Răng mọc ngầm",
+    12: "Xoang hàm trên",
+    13: "Tiêu xương",
+    14: "Răng gãy vỡ",
+    15: "Răng vĩnh viễn",
+    16: "Răng trồi",
+    17: "Neo chỉnh nha (TAD)",
+    18: "Trụ implant",
+    19: "Mòn răng",
+    20: "Khuyết hổng xương",
+    21: "Đầu lành thương nướu",
+    22: "Band kim loại",
+    23: "Mắc cài chỉnh nha",
+    24: "Hàm duy trì cố định",
+    25: "Chốt lõi răng",
+    26: "Nẹp vít xương",
+    27: "Dây cung chỉnh nha",
+    28: "Nang xương hàm",
+    29: "Tiêu chân răng",
+    30: "Răng sữa",
 }
 
 # ---------------------------------------------------------------------------
 # Colour palette (BGR) – one distinct colour per class index
 # ---------------------------------------------------------------------------
 _COLOURS: List[Tuple[int, int, int]] = [
-    (56,  56,  255),   # class 0 – Cavity         – blue-red
-    (31, 112,  255),   # class 1 – Fillings       – orange-blue
-    (29, 178,  255),   # class 2 – Impacted Tooth – yellow-blue
-    (10, 249,  72),    # class 3 – Implant        – green
-    (134, 219, 61),
-    (255, 157, 151),
-    (255, 178, 29),
-    (147, 210, 204),
+    (56,  56,  255),   # 0  – Caries
+    (31, 112,  255),   # 1  – Crown
+    (29, 178,  255),   # 2  – Filling
+    (10, 249,  72),    # 3  – Implant
+    (134, 219, 61),    # 4  – Malaligned
+    (255, 157, 151),   # 5  – Mandibular Canal
+    (255, 178, 29),    # 6  – Missing teeth
+    (147, 210, 204),   # 7  – Periapical lesion
+    (255,  69,   0),   # 8  – Retained root
+    (0,   191, 255),   # 9  – Root Canal Treatment
+    (255, 215,   0),   # 10 – Root Piece
+    (148,   0, 211),   # 11 – Impacted tooth
+    (0,   255, 127),   # 12 – Maxillary sinus
+    (220,  20,  60),   # 13 – Bone Loss
+    (255, 140,   0),   # 14 – Fracture teeth
+    (100, 149, 237),   # 15 – Permanent Teeth
+    (50,  205,  50),   # 16 – Supra Eruption
+    (255,  20, 147),   # 17 – TAD
+    (64,  224, 208),   # 18 – Abutment
+    (255, 165,   0),   # 19 – Attrition
+    (139,  69,  19),   # 20 – Bone defect
+    (0,   128, 128),   # 21 – Gingival former
+    (192, 192, 192),   # 22 – Metal band
+    (70,  130, 180),   # 23 – Orthodontic brackets
+    (0,   100,   0),   # 24 – Permanent retainer
+    (128,   0,   0),   # 25 – Post-core
+    (85,  107,  47),   # 26 – Plating
+    (135, 206, 235),   # 27 – Wire
+    (75,    0, 130),   # 28 – Cyst
+    (210, 105,  30),   # 29 – Root resorption
+    (127, 255, 212),   # 30 – Primary teeth
 ]
 
 _FONT       = cv2.FONT_HERSHEY_SIMPLEX

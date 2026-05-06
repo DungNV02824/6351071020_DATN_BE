@@ -140,6 +140,10 @@ class ToothDetail(BaseModel):
     treatment_method: str = Field(..., description="Phương pháp điều trị được khuyến nghị")
     estimated_duration: str = Field(..., description="Thời gian điều trị dự kiến")
     severity_percent: int = Field(..., ge=0, le=100, description="Mức độ nghiêm trọng (%)")
+    status: Literal["NEEDS_TREATMENT", "ALREADY_TREATED", "INFO"] = Field(
+        default="NEEDS_TREATMENT",
+        description="Phân loại: cần điều trị / đã điều trị / thông tin giải phẫu",
+    )
 
 
 # ---------------------------------------------------------------------------

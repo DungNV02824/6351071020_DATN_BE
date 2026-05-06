@@ -66,30 +66,280 @@ LM_LIA = 19  # Lower Incisor Apex
 # ---------------------------------------------------------------------------
 # Metadata bệnh lý → thông tin điều trị
 # ---------------------------------------------------------------------------
-NEEDS_TREATMENT_CLASSES = {"Cavity", "Impacted Tooth"}
-ALREADY_TREATED_CLASSES = {"Fillings", "Implant"}
+NEEDS_TREATMENT_CLASSES = {
+    "Caries",
+    "Malaligned",
+    "Missing teeth",
+    "Periapical lesion",
+    "Retained root",
+    "Root Piece",
+    "Impacted tooth",
+    "Bone Loss",
+    "Fracture teeth",
+    "Supra Eruption",
+    "Attrition",
+    "Bone defect",
+    "Cyst",
+    "Root resorption",
+}
+ALREADY_TREATED_CLASSES = {
+    "Crown",
+    "Filling",
+    "Implant",
+    "Root Canal Treatment",
+    "TAD",
+    "Abutment",
+    "Gingival former",
+    "Metal band",
+    "Orthodontic brackets",
+    "Permanent retainer",
+    "Post-core",
+    "Plating",
+    "Wire",
+}
 
 _DISEASE_META: Dict[str, Dict[str, Any]] = {
-    "Cavity": {
+    "Caries": {
         "disease_name": "Sâu răng",
         "latin_name": "Caries dentis",
         "treatment_method": "Nạo bỏ mô sâu, trám composite hoặc GIC, bọc sứ nếu tổn thương lớn",
         "estimated_duration": "1–2 buổi (30–60 phút/buổi)",
         "severity_percent": 65,
     },
-    "Impacted Tooth": {
-        "disease_name": "Răng khôn mọc lệch",
+    "Impacted tooth": {
+        "disease_name": "Răng mọc ngầm / lệch",
         "latin_name": "Dens impactus",
-        "treatment_method": "Tiểu phẫu nhổ răng khôn, phẫu thuật răng ngầm nếu cần",
+        "treatment_method": "Tiểu phẫu nhổ răng ngầm, phẫu thuật nếu cần thiết",
         "estimated_duration": "1 buổi (45–90 phút)",
         "severity_percent": 70,
     },
+    "Malaligned": {
+        "disease_name": "Răng lệch lạc",
+        "latin_name": "Malocclusion",
+        "treatment_method": "Chỉnh nha bằng mắc cài hoặc máng trong suốt",
+        "estimated_duration": "12–24 tháng",
+        "severity_percent": 55,
+    },
+    "Missing teeth": {
+        "disease_name": "Mất răng",
+        "latin_name": "Edentulism",
+        "treatment_method": "Cấy ghép implant, cầu răng sứ hoặc hàm tháo lắp",
+        "estimated_duration": "3–6 tháng (implant)",
+        "severity_percent": 75,
+    },
+    "Periapical lesion": {
+        "disease_name": "Tổn thương quanh chóp",
+        "latin_name": "Lesio periapicalis",
+        "treatment_method": "Điều trị tủy, phẫu thuật cắt chóp nếu cần",
+        "estimated_duration": "2–4 buổi (45–60 phút/buổi)",
+        "severity_percent": 80,
+    },
+    "Retained root": {
+        "disease_name": "Chân răng còn sót",
+        "latin_name": "Radix relicta",
+        "treatment_method": "Nhổ bỏ chân răng sót, vệ sinh ổ xương",
+        "estimated_duration": "1 buổi (30–45 phút)",
+        "severity_percent": 60,
+    },
+    "Root Piece": {
+        "disease_name": "Mảnh chân răng",
+        "latin_name": "Fragmentum radicis",
+        "treatment_method": "Lấy mảnh chân răng qua tiểu phẫu",
+        "estimated_duration": "1 buổi (30–60 phút)",
+        "severity_percent": 60,
+    },
+    "Bone Loss": {
+        "disease_name": "Tiêu xương ổ răng",
+        "latin_name": "Resorptio ossis alveolaris",
+        "treatment_method": "Điều trị nha chu, ghép xương nếu mất xương nặng",
+        "estimated_duration": "3–6 tháng",
+        "severity_percent": 85,
+    },
+    "Fracture teeth": {
+        "disease_name": "Răng gãy vỡ",
+        "latin_name": "Fractura dentis",
+        "treatment_method": "Trám phục hồi, bọc mão răng hoặc nhổ nếu không phục hồi được",
+        "estimated_duration": "1–2 buổi (30–60 phút/buổi)",
+        "severity_percent": 75,
+    },
+    "Supra Eruption": {
+        "disease_name": "Răng trồi",
+        "latin_name": "Supra-eruptio dentis",
+        "treatment_method": "Mài điều chỉnh hoặc chỉnh nha, bổ sung răng đối diện",
+        "estimated_duration": "Tùy mức độ (1 buổi – vài tháng)",
+        "severity_percent": 50,
+    },
+    "Attrition": {
+        "disease_name": "Mòn răng",
+        "latin_name": "Attritio dentis",
+        "treatment_method": "Trám phục hồi bề mặt, máng bảo vệ răng, điều trị nguyên nhân",
+        "estimated_duration": "1–2 buổi",
+        "severity_percent": 55,
+    },
+    "Bone defect": {
+        "disease_name": "Khuyết hổng xương",
+        "latin_name": "Defectus ossis",
+        "treatment_method": "Ghép xương tái sinh, màng collagen, tái tạo xương có hướng dẫn",
+        "estimated_duration": "4–6 tháng",
+        "severity_percent": 80,
+    },
+    "Cyst": {
+        "disease_name": "Nang xương hàm",
+        "latin_name": "Cystis maxillaris",
+        "treatment_method": "Phẫu thuật cắt bỏ nang, nạo sạch vùng bệnh",
+        "estimated_duration": "1 buổi (60–120 phút)",
+        "severity_percent": 85,
+    },
+    "Root resorption": {
+        "disease_name": "Tiêu chân răng",
+        "latin_name": "Resorptio radicis",
+        "treatment_method": "Theo dõi, điều trị tủy hoặc nhổ răng nếu tiêu chân nặng",
+        "estimated_duration": "Tùy mức độ",
+        "severity_percent": 70,
+    },
+    # ------------------------------------------------------------------
+    # ALREADY_TREATED – đã được can thiệp / đang điều trị
+    # ------------------------------------------------------------------
+    "Crown": {
+        "disease_name": "Mão răng sứ",
+        "latin_name": "Corona dentis artificialis",
+        "treatment_method": "Theo dõi định kỳ; thay mão khi mòn, hở hoặc vỡ",
+        "estimated_duration": "Đã được điều trị",
+        "severity_percent": 20,
+    },
+    "Filling": {
+        "disease_name": "Trám răng",
+        "latin_name": "Restauratio dentis",
+        "treatment_method": "Theo dõi định kỳ; thay trám khi bong, hở hoặc mòn",
+        "estimated_duration": "Đã được điều trị",
+        "severity_percent": 15,
+    },
+    "Implant": {
+        "disease_name": "Cấy ghép Implant",
+        "latin_name": "Implantum dentale",
+        "treatment_method": "Vệ sinh kỹ vùng implant; kiểm tra định kỳ 6 tháng/lần",
+        "estimated_duration": "Đã được điều trị",
+        "severity_percent": 10,
+    },
+    "Root Canal Treatment": {
+        "disease_name": "Điều trị tủy",
+        "latin_name": "Therapia endodontica",
+        "treatment_method": "Theo dõi định kỳ; kiểm tra tình trạng chóp răng hàng năm",
+        "estimated_duration": "Đã được điều trị",
+        "severity_percent": 20,
+    },
+    "TAD": {
+        "disease_name": "Neo chỉnh nha (TAD)",
+        "latin_name": "Anchoratio orthodontica temporaria",
+        "treatment_method": "Theo dõi quá trình chỉnh nha; tháo bỏ sau khi hoàn tất",
+        "estimated_duration": "Đang điều trị chỉnh nha",
+        "severity_percent": 10,
+    },
+    "Abutment": {
+        "disease_name": "Trụ implant (Abutment)",
+        "latin_name": "Abutmentum implanti",
+        "treatment_method": "Kiểm tra định kỳ; vệ sinh kỹ vùng trụ và đường viền nướu",
+        "estimated_duration": "Đã được điều trị",
+        "severity_percent": 10,
+    },
+    "Gingival former": {
+        "disease_name": "Đầu lành thương nướu",
+        "latin_name": "Formator gingivae",
+        "treatment_method": "Theo dõi lành thương nướu; chuẩn bị gắn phục hình cuối cùng",
+        "estimated_duration": "Đang trong quá trình điều trị",
+        "severity_percent": 15,
+    },
+    "Metal band": {
+        "disease_name": "Band kim loại chỉnh nha",
+        "latin_name": "Banda metallica orthodontica",
+        "treatment_method": "Đang trong quá trình chỉnh nha; theo dõi định kỳ, vệ sinh kỹ",
+        "estimated_duration": "Đang điều trị chỉnh nha",
+        "severity_percent": 10,
+    },
+    "Orthodontic brackets": {
+        "disease_name": "Mắc cài chỉnh nha",
+        "latin_name": "Brachia orthodontica",
+        "treatment_method": "Đang trong quá trình chỉnh nha; vệ sinh kỹ vùng mắc cài sau mỗi bữa ăn",
+        "estimated_duration": "Đang điều trị chỉnh nha",
+        "severity_percent": 10,
+    },
+    "Permanent retainer": {
+        "disease_name": "Hàm duy trì cố định",
+        "latin_name": "Retentio permanens",
+        "treatment_method": "Vệ sinh kỹ vùng dây duy trì bằng chỉ nha khoa; kiểm tra định kỳ",
+        "estimated_duration": "Duy trì sau chỉnh nha",
+        "severity_percent": 10,
+    },
+    "Post-core": {
+        "disease_name": "Chốt lõi phục hình",
+        "latin_name": "Post et core",
+        "treatment_method": "Theo dõi định kỳ; kiểm tra độ bền của mão và chốt",
+        "estimated_duration": "Đã được điều trị",
+        "severity_percent": 20,
+    },
+    "Plating": {
+        "disease_name": "Nẹp vít xương",
+        "latin_name": "Osteosynthesis",
+        "treatment_method": "Theo dõi lành thương xương; tháo nẹp vít khi cần thiết",
+        "estimated_duration": "Đã được điều trị",
+        "severity_percent": 15,
+    },
+    "Wire": {
+        "disease_name": "Dây cung chỉnh nha",
+        "latin_name": "Arcus orthodonticus",
+        "treatment_method": "Đang trong quá trình chỉnh nha; điều chỉnh định kỳ theo lịch hẹn",
+        "estimated_duration": "Đang điều trị chỉnh nha",
+        "severity_percent": 10,
+    },
+    # ------------------------------------------------------------------
+    # INFO – cấu trúc giải phẫu bình thường (không phải bệnh lý)
+    # ------------------------------------------------------------------
+    "Mandibular Canal": {
+        "disease_name": "Ống thần kinh hàm dưới",
+        "latin_name": "Canalis mandibularis",
+        "treatment_method": "Không cần điều trị; cần lưu ý khi thực hiện thủ thuật vùng hàm dưới",
+        "estimated_duration": "Không áp dụng",
+        "severity_percent": 5,
+    },
+    "Maxillary sinus": {
+        "disease_name": "Xoang hàm trên",
+        "latin_name": "Sinus maxillaris",
+        "treatment_method": "Không cần điều trị; cần lưu ý khi cấy ghép implant vùng hàm trên",
+        "estimated_duration": "Không áp dụng",
+        "severity_percent": 5,
+    },
+    "Permanent Teeth": {
+        "disease_name": "Răng vĩnh viễn",
+        "latin_name": "Dentes permanentes",
+        "treatment_method": "Duy trì vệ sinh răng miệng tốt; khám định kỳ 6 tháng/lần",
+        "estimated_duration": "Không áp dụng",
+        "severity_percent": 5,
+    },
+    "Primary teeth": {
+        "disease_name": "Răng sữa",
+        "latin_name": "Dentes decidui",
+        "treatment_method": "Theo dõi quá trình thay răng; bảo vệ đến khi răng vĩnh viễn mọc",
+        "estimated_duration": "Không áp dụng",
+        "severity_percent": 5,
+    },
+}
+
+INFO_CLASSES = {
+    "Mandibular Canal",
+    "Maxillary sinus",
+    "Permanent Teeth",
+    "Primary teeth",
 }
 
 _ISSUE_STATUS_MAP: Dict[str, str] = {
     **{k: "NEEDS_TREATMENT" for k in NEEDS_TREATMENT_CLASSES},
     **{k: "ALREADY_TREATED" for k in ALREADY_TREATED_CLASSES},
+    **{k: "INFO" for k in INFO_CLASSES},
 }
+
+# Lookup phân biệt hoa/thường: key.lower() → giá trị gốc
+_DISEASE_META_LC: Dict[str, Dict[str, Any]] = {k.lower(): v for k, v in _DISEASE_META.items()}
+_ISSUE_STATUS_MAP_LC: Dict[str, str] = {k.lower(): v for k, v in _ISSUE_STATUS_MAP.items()}
 
 
 # ---------------------------------------------------------------------------
@@ -184,7 +434,6 @@ def _build_panoramic_result(
 
     panoramic: List[ToothAnalysis] = []
     cavity_count = 0
-    needs_treatment_set: set = set()
 
     for tooth in data:
         tooth_num = str(tooth["tooth_number"])
@@ -192,7 +441,7 @@ def _build_panoramic_result(
 
         for iss in tooth.get("issues", []):
             name = iss["issue_name"]
-            status = _ISSUE_STATUS_MAP.get(name, "NEEDS_TREATMENT")
+            status = _ISSUE_STATUS_MAP_LC.get(name.lower(), "NEEDS_TREATMENT")
             issues_out.append(
                 IssueItem(
                     issue_name=name,
@@ -201,10 +450,8 @@ def _build_panoramic_result(
                     status=status,
                 )
             )
-            if name == "Cavity":
+            if name == "Caries":
                 cavity_count += 1
-            if name in NEEDS_TREATMENT_CLASSES:
-                needs_treatment_set.add(tooth_num)
 
         if issues_out:
             panoramic.append(
@@ -215,11 +462,12 @@ def _build_panoramic_result(
                 )
             )
 
+    healthy = max(0, total_teeth - teeth_with_issues)
     summary = ReportSummary(
         total_teeth=total_teeth,
-        healthy=max(0, total_teeth - teeth_with_issues),
+        healthy=healthy,
         cavities=cavity_count,
-        needs_treatment=len(needs_treatment_set),
+        needs_treatment=total_teeth - healthy,
     )
 
     return panoramic, summary
@@ -292,7 +540,6 @@ def _build_ceph_result(points: List[Dict]) -> CephAnalysis:
 
 async def _get_openai_consultation(
     panoramic: List[ToothAnalysis],
-    ceph: Optional[CephAnalysis],
 ) -> Consultation:
     """
     Gọi GPT-4o (openai >= 1.0 / AsyncOpenAI) để tạo lời tư vấn bằng tiếng Việt.
@@ -307,41 +554,47 @@ async def _get_openai_consultation(
         )
 
     # --- Tóm tắt findings để đưa vào prompt ---
+    # Gộp tất cả bệnh lý (cả đã điều trị lẫn cần điều trị) theo từng răng
     teeth_summary_parts: List[str] = []
     for tooth in panoramic:
-        needs = [i.issue_name for i in tooth.issues if i.status == "NEEDS_TREATMENT"]
-        if needs:
-            teeth_summary_parts.append(f"Răng {tooth.tooth_number}: {', '.join(needs)}")
+        all_issues = [i.issue_name for i in tooth.issues]
+        if all_issues:
+            teeth_summary_parts.append(f"Răng {tooth.tooth_number}: {', '.join(all_issues)}")
 
     if not teeth_summary_parts:
-        teeth_summary_parts = ["Không phát hiện bệnh lý cần điều trị trên ảnh Panoramic."]
-
-    ceph_summary = "Không có ảnh Cephalometric."
-    if ceph:
-        ceph_summary = (
-            f"ANB = {ceph.metrics.ANB}°, SNA = {ceph.metrics.SNA}°, "
-            f"SNB = {ceph.metrics.SNB}°. Kết luận: {ceph.conclusion}."
-        )
+        teeth_summary_parts = ["Không phát hiện bệnh lý nào trên ảnh Panoramic."]
 
     user_prompt = (
-        "Dựa trên kết quả:\n"
+        "Dựa trên kết quả X-quang Panoramic, các bệnh lý răng miệng được phát hiện như sau:\n"
         + "\n".join(f"- {s}" for s in teeth_summary_parts)
-        + f"\n- {ceph_summary}\n\n"
-        "Hãy đóng vai nha sĩ chuyên nghiệp để viết lời khuyên ngắn gọn, "
-        "súc tích bằng tiếng Việt cho bệnh nhân.\n\n"
+        + "\n\n"
+        "Hãy đóng vai nha sĩ chuyên nghiệp để viết tư vấn chi tiết về sức khỏe răng miệng "
+        "bằng tiếng Việt. CHỈ tư vấn về tình trạng các răng, bệnh lý răng miệng, "
+        "KHÔNG đề cập đến khớp cắn, hô, móm hay các chỉ số Cephalometric.\n\n"
         "Trả về JSON (không có markdown code-block) với cấu trúc chính xác:\n"
         "{\n"
-        '  "overall_assessment": ["<câu đánh giá 1>", "<câu đánh giá 2>"],\n'
+        '  "overall_assessment": [\n'
+        '    "<câu đánh giá tổng thể tình trạng sức khỏe răng miệng 1>",\n'
+        '    "<câu đánh giá 2 về mức độ nghiêm trọng>",\n'
+        '    "<câu đánh giá 3 về ưu tiên điều trị>"\n'
+        "  ],\n"
         '  "main_issues": [\n'
-        '    {"issue": "<tên vấn đề>", "detail": "<mô tả>", "recommendation": "<khuyến nghị>"}\n'
+        '    {\n'
+        '      "issue": "<tên bệnh lý cụ thể – ví dụ: Sâu răng số 46>",\n'
+        '      "detail": "<mô tả chi tiết về tình trạng, nguyên nhân, hậu quả nếu không điều trị>",\n'
+        '      "recommendation": "<khuyến nghị điều trị cụ thể và thời gian>"\n'
+        '    }\n'
         "  ]\n"
-        "}"
+        "}\n\n"
+        "Lưu ý: overall_assessment cần nhận xét tổng quan về tình trạng sức khỏe răng miệng "
+        "dựa trên danh sách bệnh lý thực tế. main_issues liệt kê từng vấn đề với đầy đủ chi tiết."
     )
 
     system_prompt = (
-        "Bạn là nha sĩ chuyên nghiệp. "
-        "Hãy phân tích kết quả X-quang và trả về CHÍNH XÁC JSON theo schema được yêu cầu, "
-        "không thêm bất kỳ văn bản nào ngoài JSON."
+        "Bạn là nha sĩ chuyên nghiệp với hơn 15 năm kinh nghiệm. "
+        "Hãy phân tích kết quả X-quang răng và đưa ra tư vấn CHI TIẾT về từng bệnh lý răng miệng. "
+        "Chỉ tập trung vào sức khỏe răng, KHÔNG đề cập khớp cắn hay Cephalometric. "
+        "Trả về CHÍNH XÁC JSON theo schema được yêu cầu, không thêm bất kỳ văn bản nào ngoài JSON."
     )
 
     try:
@@ -502,26 +755,25 @@ async def _get_ceph_ai_analysis(ceph: CephAnalysis) -> Optional[CephAiAnalysis]:
 # ---------------------------------------------------------------------------
 
 def _build_teeth_details(panoramic: List[ToothAnalysis]) -> List[ToothDetail]:
-    """Tạo danh sách chi tiết điều trị cho các răng cần can thiệp."""
+    """Tạo danh sách chi tiết cho tất cả răng có vấn đề (cả đã điều trị lẫn cần điều trị)."""
     details: List[ToothDetail] = []
     seen: set = set()
 
     for tooth in panoramic:
         for issue in tooth.issues:
-            if issue.status != "NEEDS_TREATMENT":
-                continue
             key = (tooth.tooth_number, issue.issue_name)
             if key in seen:
                 continue
             seen.add(key)
 
-            meta = _DISEASE_META.get(issue.issue_name)
+            meta = _DISEASE_META_LC.get(issue.issue_name.lower())
+            status = _ISSUE_STATUS_MAP_LC.get(issue.issue_name.lower(), "NEEDS_TREATMENT")
             if meta is None:
                 meta = {
                     "disease_name": issue.issue_name,
-                    "latin_name": "N/A",
+                    "latin_name": "",
                     "treatment_method": "Tham khảo nha sĩ",
-                    "estimated_duration": "Chưa xác định",
+                    "estimated_duration": "Tùy tình trạng",
                     "severity_percent": 50,
                 }
 
@@ -533,6 +785,7 @@ def _build_teeth_details(panoramic: List[ToothAnalysis]) -> List[ToothDetail]:
                     treatment_method=meta["treatment_method"],
                     estimated_duration=meta["estimated_duration"],
                     severity_percent=meta["severity_percent"],
+                    status=status,
                 )
             )
 
@@ -603,7 +856,7 @@ async def build_full_report(
     # Bước 3: OpenAI tư vấn + phân tích Cephalometric AI (chạy song song)
     # ------------------------------------------------------------------
     logger.info("Gọi OpenAI GPT-4o để tạo tư vấn và phân tích Cephalometric …")
-    tasks = [_get_openai_consultation(panoramic_list, ceph_result)]
+    tasks = [_get_openai_consultation(panoramic_list)]
     if ceph_result:
         tasks.append(_get_ceph_ai_analysis(ceph_result))  # type: ignore[arg-type]
 

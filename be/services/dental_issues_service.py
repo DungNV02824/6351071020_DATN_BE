@@ -27,15 +27,44 @@ logger = logging.getLogger(__name__)
 #   NEEDS_TREATMENT : bệnh cần can thiệp tích cực (chưa được xử lý)
 #   ALREADY_TREATED : tình trạng đã được điều trị (không cần can thiệp thêm)
 # ---------------------------------------------------------------------------
-NEEDS_TREATMENT_CLASSES: set = {"Cavity", "Impacted Tooth"}
-ALREADY_TREATED_CLASSES: set = {"Fillings", "Implant"}
+NEEDS_TREATMENT_CLASSES: set = {
+    "Caries",
+    "Malaligned",
+    "Missing teeth",
+    "Periapical lesion",
+    "Retained root",
+    "Root Piece",
+    "Impacted tooth",
+    "Bone Loss",
+    "Fracture teeth",
+    "Supra Eruption",
+    "Attrition",
+    "Bone defect",
+    "Cyst",
+    "Root resorption",
+}
+ALREADY_TREATED_CLASSES: set = {
+    "Crown",
+    "Filling",
+    "Implant",
+    "Root Canal Treatment",
+    "TAD",
+    "Abutment",
+    "Gingival former",
+    "Metal band",
+    "Orthodontic brackets",
+    "Permanent retainer",
+    "Post-core",
+    "Plating",
+    "Wire",
+}
 
 # ---------------------------------------------------------------------------
 # Đường dẫn tới các file model
 # ---------------------------------------------------------------------------
 _BASE = Path(__file__).resolve().parent.parent / "Model"
 FDI_MODEL_PATH = _BASE / "fdi.pt"
-CV_MODEL_PATH  = _BASE / "CV.pt"
+CV_MODEL_PATH  = _BASE / "CV2.pt"
 
 # Ngưỡng IoU dự phòng khi tâm box bệnh lý không nằm trong bất kỳ box răng nào
 MIN_IOU = 0.10
