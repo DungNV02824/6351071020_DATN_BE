@@ -24,6 +24,14 @@ LANDMARK_MAP = {
     "Pog": 6, # Pogonion (Điểm 7 trên ảnh)
     "Me": 3   # Menton (Điểm 4 trên ảnh)
 }
+# MAPPING ĐẦY ĐỦ 29 ĐIỂM THEO DANH SÁCH CỦA BẠN
+LANDMARK_MAP_2 = {
+    "A": 0, "ANS": 1, "B": 2, "Me": 3, "N": 4, "Or": 5, "Pog": 6, 
+    "PNS": 7, "Pn": 8, "R": 9, "S": 10, "Ar": 11, "Co": 12, "Gn": 13, 
+    "Go": 14, "Po": 15, "LPM": 16, "LIT": 17, "LMT": 18, "UPM": 19, 
+    "UIA": 20, "UIT": 21, "UMT": 22, "LIA": 23, "Li": 24, "Ls": 25, 
+    "N`": 26, "Pog`": 27, "Sn": 28
+}
 
 # =========================================================================
 # 1. HÀM CHUYỂN ĐỔI HEATMAP VÀ KIẾN TRÚC MÔ HÌNH
@@ -236,6 +244,216 @@ def process_and_draw_analysis(image_bytes: bytes) -> bytes:
 
     except Exception as e:
         raise Exception(f"Lỗi trong quá trình phân tích và vẽ: {str(e)}")
+###########################################################################
+import cv2
+import numpy as np
+import io
+import json
+from PIL import Image
+
+def process_morphing_tps(image_bytes, source_pts_dict, target_pts_dict):
+    try:
+        # 1. Load ảnh
+        img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img_np = np.array(img)
+        # OpenCV dùng BGR
+        img_cv = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+        h, w, _ = img_cv.shape
+
+        # 2. Chuẩn bị điểm mốc
+        # Lọc lấy các key chung (S, N, A, B, Pog, Go, Me...)
+        keys = [k for k in source_pts_dict if k in target_pts_dict]
+        
+        src_pts = []
+        dst_pts = []
+        
+        for k in keys:
+            src_pts.append([source_pts_dict[k]['x'], source_pts_dict[k]['y']])
+            dst_pts.append([target_pts_dict[k]['x'], target_pts_dict[k]['y']])
+
+        # THÊM CÁC ĐIỂM CỐ ĐỊNH Ở 4 GÓC để ảnh không bị méo khung ngoài
+        # Đây là bước cực kỳ quan trọng để tránh lỗi co rúm ảnh
+        border = [
+            [0, 0], [w-1, 0], [0, h-1], [w-1, h-1],
+            [w//2, 0], [w//2, h-1], [0, h//2], [w-1, h//2]
+        ]
+        src_pts.extend(border)
+        dst_pts.extend(border)
+
+        # Ép kiểu về float32 và định dạng (1, N, 2)
+        sources = np.array([src_pts], dtype=np.float32)
+        targets = np.array([dst_pts], dtype=np.float32)
+
+        # 3. Thực hiện thuật toán TPS
+        tps = cv2.createThinPlateSplineShapeTransformer()
+        
+        # Tạo danh sách các điểm khớp (1-1, 2-2...)
+        matches = [cv2.DMatch(i, i, 0) for i in range(len(src_pts))]
+        
+        # Ước tính biến dạng
+        tps.estimateTransformation(targets, sources, matches)
+        
+        # Nắn ảnh
+        warped_img = tps.warpImage(img_cv)
+
+        # 4. Trả về bytes
+        _, buffer = cv2.imencode(".png", warped_img)
+        return buffer.tobytes()
+    except Exception as e:
+        print(f"Lỗi tại process_morphing_tps: {str(e)}")
+        raise e
+
+import json
+
+def draw_analysis_from_custom_points(image_bytes: bytes, points_json: str) -> bytes:
+    """Vẽ phân tích dựa trên tọa độ người dùng đã chỉnh sửa trên FE"""
+    try:
+        # 1. Đọc ảnh và tọa độ
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        orig_w, orig_h = image.size
+        pts = json.loads(points_json) # Nhận dictionary { 'S': {'x':..,'y':..}, ... }
+
+        # 2. Tính toán lại góc dựa trên điểm mới
+        def get_pt(name): return (pts[name]['x'], pts[name]['y'])
+        
+        sna = calculate_angle(get_pt("S"), get_pt("N"), get_pt("A"))
+        snb = calculate_angle(get_pt("S"), get_pt("N"), get_pt("B"))
+        anb = sna - snb
+
+        # Logic chẩn đoán
+        if anb > 4.0: diagnosis = f"Chuan Doan Ho (ANB = {anb:.2f} deg)"
+        elif anb < 0.0: diagnosis = f"Chuan Doan Mom (ANB = {anb:.2f} deg)"
+        else: diagnosis = f"Chuan Doan Binh Thuong (ANB = {anb:.2f} deg)"
+
+        # 3. Vẽ lên ảnh
+        draw = ImageDraw.Draw(image)
+        line_color = (0, 255, 0) # Xanh lá
+        line_width = max(3, int(orig_w * 0.004))
+        
+        # Vẽ các đường nối
+        def draw_l(p1, p2): draw.line([get_pt(p1), get_pt(p2)], fill=line_color, width=line_width)
+        draw_l("S", "N"); draw_l("N", "A"); draw_l("N", "B"); draw_l("N", "Pog"); draw_l("Go", "Me")
+
+        # Vẽ điểm và tên
+        radius = max(5, int(orig_w * 0.008))
+        for name in pts:
+            curr_pt = get_pt(name)
+            draw.ellipse([curr_pt[0]-radius, curr_pt[1]-radius, curr_pt[0]+radius, curr_pt[1]+radius], fill=(255,0,0))
+            # Vẽ text (giả định bạn đã có logic font từ code trước)
+            # draw.text(...) 
+
+        # 4. Xuất ảnh
+        buf = io.BytesIO()
+        image.save(buf, format="PNG")
+        return buf.getvalue()
+    except Exception as e:
+        raise Exception(f"Lỗi khi vẽ ảnh chỉnh sửa: {str(e)}")
+    
+def process_and_get_analysis_data(image_bytes: bytes):
+    """Dự đoán các điểm và trả về tọa độ cùng kích thước ảnh gốc"""
+    try:
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        orig_w, orig_h = image.size
+
+        # Giả sử IMG_SIZE model của bạn là 512
+        img_tensor = image_transforms(image).unsqueeze(0).to(DEVICE)
+        with torch.no_grad():
+            pred_hm = model(img_tensor)
+
+        pred_hm_np = pred_hm.squeeze(0).cpu().numpy()
+        pred_pts = heatmap_to_coord(pred_hm_np)
+
+        scale_x = orig_w / 512 # Thay 512 bằng IMG_SIZE của bạn
+        scale_y = orig_h / 512
+        
+        landmarks = {}
+        for key, idx in LANDMARK_MAP.items():
+            landmarks[key] = {
+                "x": float(pred_pts[idx][0]) * scale_x,
+                "y": float(pred_pts[idx][1]) * scale_y
+            }
+
+        return {
+            "landmarks": landmarks,
+            "image_size": {"width": orig_w, "height": orig_h}
+        }
+    except Exception as e:
+        raise Exception(f"Lỗi phân tích: {str(e)}")
+
+def process_and_draw_analysis_2(image_bytes: bytes) -> bytes:
+    """Phân tích Cephalometric, vẽ đường nối S-N-A-B và in kết quả chẩn đoán"""
+    try:
+        # 1. Đọc và dự đoán điểm
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        orig_w, orig_h = image.size
+
+        img_tensor = image_transforms(image).unsqueeze(0).to(DEVICE)
+        with torch.no_grad():
+            pred_hm = model(img_tensor)
+
+        pred_hm_np = pred_hm.squeeze(0).cpu().numpy()
+        pred_pts = heatmap_to_coord(pred_hm_np)
+
+        # 2. Scale và lọc ra các điểm quan trọng
+        scale_x = orig_w / IMG_SIZE
+        scale_y = orig_h / IMG_SIZE
+        
+        pts = {}
+        for key, idx in LANDMARK_MAP.items():
+            pts[key] = (float(pred_pts[idx][0]) * scale_x, float(pred_pts[idx][1]) * scale_y)
+
+        # 3. Tính toán góc
+        sna = calculate_angle(pts["S"], pts["N"], pts["A"])
+        snb = calculate_angle(pts["S"], pts["N"], pts["B"])
+        anb = sna - snb
+
+        # 4. Logic chẩn đoán
+        if anb > 4.0:
+            diagnosis = f"Chẩn Đoán Hô (ANB = {anb:.2f}°)"
+        elif anb < 0.0:
+            diagnosis = f"Chẩn Đoán Móm (ANB = {anb:.2f}°)"
+        else:
+            diagnosis = f"Chẩn Đoán Bình Thường (ANB = {anb:.2f}°)"
+
+        # 5. Cài đặt vẽ & Font chữ
+        draw = ImageDraw.Draw(image)
+        font_size_large = max(20, int(orig_w * 0.035))
+        font_size_small = max(14, int(orig_w * 0.025))
+        
+        try:
+            # Ưu tiên load font Arial đậm cho dễ nhìn
+            font_title = ImageFont.truetype("arialbd.ttf", font_size_large)
+            font_info = ImageFont.truetype("arialbd.ttf", font_size_small)
+        except IOError:
+            # Fallback nếu không tìm thấy font (trên Linux)
+            font_title = font_info = ImageFont.load_default()
+
+        # --- 5.1 Vẽ các đường thẳng (Màu xanh lá) ---
+        line_color = (0, 255, 0)
+        line_width = max(2, int(orig_w * 0.003))
+        
+        draw.line([pts["S"], pts["N"]], fill=line_color, width=line_width)
+        draw.line([pts["N"], pts["A"]], fill=line_color, width=line_width)
+        draw.line([pts["N"], pts["B"]], fill=line_color, width=line_width)
+        draw.line([pts["N"], pts["Pog"]], fill=line_color, width=line_width)
+        draw.line([pts["Go"], pts["Me"]], fill=line_color, width=line_width)
+
+        # --- 5.2 Vẽ các điểm và tên (Màu đỏ/Trắng) ---
+        radius = max(4, int(orig_w * 0.007))
+        for name, pt in pts.items():
+            cx, cy = pt
+            draw.ellipse([cx - radius, cy - radius, cx + radius, cy + radius], fill=(255, 0, 0))
+            draw.text((cx + radius + 5, cy - radius - 5), name, fill=(255, 255, 255), font=font_info)
+
+        # 6. Trả về bytes
+        buf = io.BytesIO()
+        image.save(buf, format="PNG")
+        buf.seek(0)
+        return buf.read()
+
+    except Exception as e:
+        raise Exception(f"Lỗi trong quá trình phân tích và vẽ: {str(e)}")
+##############################################################################
 
 
 def process_and_get_analysis_data(image_bytes: bytes) -> dict:

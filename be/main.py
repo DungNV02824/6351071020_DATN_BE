@@ -13,6 +13,7 @@ from routers.cv_router import router as dental_cv_router
 from routers.dental_issues_router import router as dental_issues_router
 from routers.diagnosis_router import router as diagnosis_router
 from routers.auth import router as auth
+from routers.soft_tissue_router import router as soft_tissue_router
 # ---------------------------------------------------------------------------
 # Logging – structured, INFO level by default; override via LOG_LEVEL env var
 # ---------------------------------------------------------------------------
@@ -60,6 +61,7 @@ app.include_router(dental_cv_router)
 app.include_router(dental_issues_router)
 app.include_router(diagnosis_router)
 app.include_router(auth)
+app.include_router(soft_tissue_router)
 
 @app.get("/", tags=["Health"])
 def root():
